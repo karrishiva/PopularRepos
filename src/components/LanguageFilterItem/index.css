@@ -1,0 +1,20 @@
+/* Write your CSS here */
+.list-element {
+  font-family: 'Roboto';
+  font-weight: 600;
+  margin-right: 50px;
+}
+
+.active-btn {
+  width: 100px;
+  background-color: #ffff;
+  color: #0284c7;
+  border: 2px solid #0284c7;
+  border-radius: 15px;
+}
+
+.btn-element {
+  margin-right: 30px;
+  background-color: transparent;
+  border: none;
+}
