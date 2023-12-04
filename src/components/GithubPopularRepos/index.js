@@ -1,4 +1,5 @@
 import {Component} from 'react'
+import Loader from 'react-loader-spinner'
 import RepositoryItem from '../RepositoryItem'
 import LanguageFilterItem from '../LanguageFilterItem'
 
@@ -18,11 +19,11 @@ class GitHubPopularRepos extends Component {
   state = {
     selectedLanguage: languageFiltersData[0].id,
     reposList: [],
+    isLoading: true,
   }
 
   componentDidMount() {
-    const {selectedLanguage} = this.state
-    this.getGitHubRepos(selectedLanguage)
+    this.getGitHubRepos()
   }
 
   activeLanguage = id => {
@@ -30,10 +31,15 @@ class GitHubPopularRepos extends Component {
       item => item.id === id,
     )
 
-    this.setState({selectedLanguage: activeLanguageElement.id})
+    this.setState(
+      {selectedLanguage: activeLanguageElement.id},
+      this.getGitHubRepos,
+    )
   }
 
-  getGitHubRepos = async selectedLanguage => {
+  getGitHubRepos = async () => {
+    const {selectedLanguage} = this.state
+    this.setState({isLoading: true})
     const apiUrl = `https://apis.ccbp.in/popular-repos?language=${selectedLanguage}`
 
     const response = await fetch(apiUrl)
@@ -49,14 +55,15 @@ class GitHubPopularRepos extends Component {
       issuesCount: eachRepo.issues_count,
     }))
 
-    this.setState({reposList: respositoryList})
+    this.setState({reposList: respositoryList, isLoading: false})
   }
 
   render() {
-    const {selectedLanguage, reposList} = this.state
+    const {selectedLanguage, reposList, isLoading} = this.state
     return (
       <nav className="nav-container">
         <h1 className="main-heading">Popular</h1>
+
         <ul className="languages-container">
           {languageFiltersData.map(filterLanguage => (
             <LanguageFilterItem
@@ -67,11 +74,17 @@ class GitHubPopularRepos extends Component {
             />
           ))}
         </ul>
-        <ul className="list-container">
-          {reposList.map(eachRepo => (
-            <RepositoryItem key={eachRepo.id} repoDetails={eachRepo} />
-          ))}
-        </ul>
+        {isLoading ? (
+          <div data-testid="loader">
+            <Loader type="ThreeDots" color="#0284c7" height={80} width={80} />
+          </div>
+        ) : (
+          <ul className="list-container">
+            {reposList.map(eachRepo => (
+              <RepositoryItem key={eachRepo.id} repoDetails={eachRepo} />
+            ))}
+          </ul>
+        )}
       </nav>
     )
   }
